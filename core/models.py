@@ -11,5 +11,5 @@ class Profile(models.Model):
     location = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
-        return self.user.get_username
+        return self.user.get_username()
     
