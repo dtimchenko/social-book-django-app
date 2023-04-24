@@ -29,10 +29,13 @@ def signup(request):
                 user = User.objects.create_user(username=username, email=email, password=password)
                 user.save()
 
+                authenticated_user = auth.authenticate(request)
+                auth.login(request, authenticated_user)
+
                 user_model = User.objects.get(username=username)
                 new_profile = Profile.objects.create(user=user_model, id_user=user_model.id)
                 new_profile.save()
-                return redirect('/')
+                return redirect('settings')
         else:
             messages.info(request, 'password not match!')
             return redirect('signup')
@@ -60,3 +63,20 @@ def signin(request):
 def logout(request):
     auth.logout(request)
     return redirect('signin')
+
+@login_required(login_url='signin')
+def settings(request):
+    user_profile = Profile.objects.get(user=request.user)
+
+    if request.method == 'POST':
+        profile_img = user_profile.profile_img if request.FILES.get('profile_image') is None else request.FILES.get('profile_image')
+        bio = request.POST['bio']
+        location = request.POST['location']
+
+        user_profile.profile_img = profile_img
+        user_profile.bio = bio
+        user_profile.location = location
+        user_profile.save()
+        return redirect('settings')
+    else:
+        return render(request, 'settings.html', {'user_profile' : user_profile})
