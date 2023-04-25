@@ -9,7 +9,9 @@ from django.shortcuts import render, redirect
 
 @login_required(login_url='signin')
 def index(request):
-    return render(request, 'index.html')
+    user = User.objects.get(username=request.user.username)
+    profile = Profile.objects.get(user=user)
+    return render(request, 'index.html', {'user_profile' : profile})
 
 def signup(request):
     if request.method == 'POST':
@@ -80,3 +82,7 @@ def settings(request):
         return redirect('settings')
     else:
         return render(request, 'settings.html', {'user_profile' : user_profile})
+
+@login_required(login_url='signin')
+def upload(request):
+    pass
