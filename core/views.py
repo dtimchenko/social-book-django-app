@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
-from .models import Profile
+from .models import Profile, Post
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -10,8 +10,11 @@ from django.shortcuts import render, redirect
 @login_required(login_url='signin')
 def index(request):
     user = User.objects.get(username=request.user.username)
-    profile = Profile.objects.get(user=user)
-    return render(request, 'index.html', {'user_profile' : profile})
+    try:
+        profile = Profile.objects.get(user=user)
+        return render(request, 'index.html', {'user_profile' : profile})
+    except:
+        return render(request, 'index.html')
 
 def signup(request):
     if request.method == 'POST':
@@ -85,4 +88,14 @@ def settings(request):
 
 @login_required(login_url='signin')
 def upload(request):
-    pass
+    if request.method == 'POST':
+        upload_img = request.FILES.get('image')
+        upload_caption = request.POST['caption']
+
+        current_user = User.objects.get(username=request.user.username) 
+        new_post = Post.objects.create(user=current_user, caption=upload_caption, image=upload_img)
+        new_post.save()
+
+        return redirect('/')
+    else:
+        return redirect('/')
