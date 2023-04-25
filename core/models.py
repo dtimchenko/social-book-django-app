@@ -25,3 +25,7 @@ class Post(models.Model):
 
     def __str__(self):
         return self.user.get_username()
+    
+class LikePost(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
