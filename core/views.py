@@ -9,10 +9,13 @@ from django.shortcuts import render, redirect
 
 @login_required(login_url='signin')
 def index(request):
-    user = User.objects.get(username=request.user.username)
     try:
+        user = User.objects.get(username=request.user.username)
         profile = Profile.objects.get(user=user)
-        return render(request, 'index.html', {'user_profile' : profile})
+
+        posts = Post.objects.order_by('create_at').reverse()
+
+        return render(request, 'index.html', {'user_profile' : profile, 'posts': posts})
     except:
         return render(request, 'index.html')
 
